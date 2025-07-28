@@ -7,10 +7,10 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-read -rp "Github Benutzer oder Organisation: " GH_USER
-read -rp "Brand (ohne Leerzeichen, z.B. acme): " BRAND
-read -rp "OnlyOffice Version (x.y.z): " PRODUCT_VERSION
-read -rp "OnlyOffice Build Nummer (t): " BUILD_NUMBER
+GH_USER="CVelar"
+BRAND="CVelar"
+PRODUCT_VERSION="8.1.2"
+BUILD_NUMBER="3"
 
 SSH_DIR="/root/.ssh"
 mkdir -p "$SSH_DIR"
@@ -44,6 +44,8 @@ read -rp "Nach dem Hochladen des Keys und dem Forken Enter drücken um fortzufah
 apt update
 apt remove -y docker docker-engine docker.io || true
 apt install -y git apt-transport-https ca-certificates curl software-properties-common
+git config --global user.email "collinvelar@gmail.com"
+git config --global user.name "CVelar"
 
 curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
