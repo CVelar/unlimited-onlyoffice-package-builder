@@ -8,7 +8,9 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 LOG_FILE="$(dirname "$0")/build-debian11.log"
-exec > >(tee "${LOG_FILE}") 2>&1
+# Log both to file and to stdout with line buffering so output
+# is immediately visible in the terminal
+exec > >(stdbuf -oL tee "${LOG_FILE}") 2>&1
 
 finish() {
   REPO_DIR="$(dirname "$0")"

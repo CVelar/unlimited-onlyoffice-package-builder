@@ -131,7 +131,7 @@ fi
 
 PRUNE_DOCKER_CONTAINERS_ACTION="false"
 if [ "x${PRUNE_DOCKER_CONTAINERS}" != "x" ] ; then
-  if [ ${PRUNE_DOCKER_CONTAINERS} == "true" ] -o [ ${PRUNE_DOCKER_CONTAINERS} == "TRUE" ] ; then
+  if [ "${PRUNE_DOCKER_CONTAINERS}" = "true" ] || [ "${PRUNE_DOCKER_CONTAINERS}" = "TRUE" ] ; then
     PRUNE_DOCKER_CONTAINERS_ACTION="true"
     cat << EOF
     WARNING !
@@ -166,7 +166,8 @@ build_oo_binaries() {
   cd build_tools
   mkdir ${_OUT_FOLDER}
   docker build --tag onlyoffice-document-editors-builder .
-  docker run -e PRODUCT_VERSION=${_PRODUCT_VERSION} -e BUILD_NUMBER=${_BUILD_NUMBER} -e NODE_ENV='production' -v $(pwd)/${_OUT_FOLDER}:/build_tools/out onlyoffice-document-editors-builder /bin/bash -c 'cd tools/linux && python3 ./automate.py --branch=tags/'"${_GIT_CLONE_BRANCH}"
+  docker run -e PRODUCT_VERSION=${_PRODUCT_VERSION} -e BUILD_NUMBER=${_BUILD_NUMBER} -e NODE_ENV='production' -v $(pwd)/${_OUT_FOLDER}:/build_tools/out \
+    onlyoffice-document-editors-builder /bin/bash -c 'curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get -qq install -y nodejs && cd tools/linux && python3 ./automate.py --branch=tags/'"${_GIT_CLONE_BRANCH}"
   cd ..
 
 }
