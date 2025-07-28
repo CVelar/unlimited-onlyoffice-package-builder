@@ -7,10 +7,13 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
+LOG_FILE="$(dirname "$0")/build-debian11.log"
+exec >"${LOG_FILE}" 2>&1
+
 GH_USER="CVelar"
 BRAND="CVelar"
-PRODUCT_VERSION="8.1.2"
-BUILD_NUMBER="3"
+PRODUCT_VERSION="8.0.1"
+BUILD_NUMBER="31"
 
 SSH_DIR="/root/.ssh"
 mkdir -p "$SSH_DIR"
@@ -112,3 +115,9 @@ git checkout v0.0.1
 ./onlyoffice-package-builder.sh --product-version=${PRODUCT_VERSION} --build-number=${BUILD_NUMBER} --unlimited-organization=${GH_USER} --tag-suffix=-${BRAND} --debian-package-suffix=-${BRAND}
 
 echo "\nFertig. Das DEB Paket befindet sich unter: ~/build-oo/unlimited-onlyoffice-package-builder/document-server-package/deb/"
+
+REPO_DIR="$(dirname "$0")"
+cp "${LOG_FILE}" "${REPO_DIR}/debian11debug"
+cd "${REPO_DIR}"
+git add debian11debug
+git commit -m "Update debian11debug"
