@@ -19,7 +19,9 @@ RUN apt-get -qq install -y sudo
 RUN apt-get -qq install -y git
 RUN apt-get -qq install -y build-essential
 RUN apt-get -qq install -y m4
-RUN apt-get -qq install -y npm
+# Install recent Node.js version required by build_tools
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get -qq install -y nodejs
 RUN apt-get -qq install -y python3 python3-distutils
 RUN ln -s /usr/bin/python3 /usr/local/bin/python
 RUN apt-get -qq install -y locales

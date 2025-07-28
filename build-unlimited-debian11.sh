@@ -8,7 +8,16 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 LOG_FILE="$(dirname "$0")/build-debian11.log"
-exec >"${LOG_FILE}" 2>&1
+exec > >(tee "${LOG_FILE}") 2>&1
+
+finish() {
+  REPO_DIR="$(dirname "$0")"
+  cp "${LOG_FILE}" "${REPO_DIR}/debian11debug"
+  cd "${REPO_DIR}"
+  git add debian11debug
+  git commit -m "Update debian11debug"
+}
+trap finish EXIT
 
 GH_USER="CVelar"
 BRAND="CVelar"
@@ -116,8 +125,3 @@ git checkout v0.0.1
 
 echo "\nFertig. Das DEB Paket befindet sich unter: ~/build-oo/unlimited-onlyoffice-package-builder/document-server-package/deb/"
 
-REPO_DIR="$(dirname "$0")"
-cp "${LOG_FILE}" "${REPO_DIR}/debian11debug"
-cd "${REPO_DIR}"
-git add debian11debug
-git commit -m "Update debian11debug"
