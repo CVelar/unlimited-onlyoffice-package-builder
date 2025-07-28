@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+set -euo pipefail
 
 if [ "$(id -u)" -ne 0 ]; then
   echo "Dieses Skript muss als root ausgeführt werden." >&2
@@ -8,7 +8,8 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 LOG_FILE="$(dirname "$0")/build-debian11.log"
-exec > >(tee "${LOG_FILE}") 2>&1
+# Log to file and stdout without buffering so we can see progress in real time
+exec > >(stdbuf -oL tee "${LOG_FILE}") 2>&1
 
 finish() {
   REPO_DIR="$(dirname "$0")"
@@ -53,16 +54,25 @@ echo "- https://github.com/ONLYOFFICE/web-apps"
 read -rp "Nach dem Hochladen des Keys und dem Forken Enter drücken um fortzufahren..."
 
 # Docker und Git installieren
-apt update
-apt remove -y docker docker-engine docker.io || true
-apt install -y git apt-transport-https ca-certificates curl software-properties-common
+apt-get update
+apt-get remove -y docker docker-engine docker.io || true
+apt-get install -y git apt-transport-https ca-certificates curl software-properties-common
+
+# Ensure we have a recent Node.js for the build tools
+NODE_MAJOR="$(node -v 2>/dev/null | sed -E 's/v([0-9]+).*/\1/' || true)"
+if [ -z "$NODE_MAJOR" ] || [ "$NODE_MAJOR" -lt 14 ]; then
+  curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+  apt-get install -y nodejs
+  hash -r
+fi
+
 git config --global user.email "collinvelar@gmail.com"
 git config --global user.name "CVelar"
 
 curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
-apt update
-apt install -y docker-ce
+apt-get update
+apt-get install -y docker-ce
 
 mkdir -p ~/onlyoffice_repos
 cd ~/onlyoffice_repos
