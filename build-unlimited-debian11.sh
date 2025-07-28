@@ -8,7 +8,8 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 LOG_FILE="$(dirname "$0")/build-debian11.log"
-exec >"${LOG_FILE}" 2>&1
+# Write output both to log file and to the console
+exec > >(tee -a "${LOG_FILE}") 2>&1
 
 GH_USER="CVelar"
 BRAND="CVelar"
@@ -74,6 +75,10 @@ git cherry-pick 7ce465ecb177fd20ebf2b459a69f98312f7a8d3d
 git cherry-pick 7da607da885285fe3cfc9feaf37b1608666039eb
 sed -i "s/unlimited_organization = \"btactic-oo\"/unlimited_organization = \"${GH_USER}\"/g" scripts/base.py
 sed -i "s/unlimited_tag_suffix = \"-btactic\"/unlimited_tag_suffix = \"-${BRAND}\"/g" scripts/base.py
+# Use a newer base image with Python 3.8+ for the build container
+sed -i 's/FROM ubuntu:16.04/FROM ubuntu:20.04/' Dockerfile
+sed -i 's/apt-get -y install python \\$/apt-get -y install python3 python3-distutils python3-pip \\/' Dockerfile
+sed -i '/ln -s \/usr\/bin\/python2 \/usr\/bin\/python/d' Dockerfile
 git add scripts/base.py
 git commit --amend --no-edit
 
@@ -121,3 +126,4 @@ cp "${LOG_FILE}" "${REPO_DIR}/debian11debug"
 cd "${REPO_DIR}"
 git add debian11debug
 git commit -m "Update debian11debug"
+git push
