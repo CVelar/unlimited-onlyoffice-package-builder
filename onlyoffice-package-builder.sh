@@ -164,6 +164,13 @@ build_oo_binaries() {
     build_tools
   # Ignore detached head warning
   cd build_tools
+  # Use a newer base image with updated git to avoid build failures
+  if grep -q "FROM ubuntu:16.04" Dockerfile; then
+    sed -i 's/FROM ubuntu:16.04/FROM ubuntu:20.04/' Dockerfile
+  fi
+  if ! grep -q "git" Dockerfile; then
+    sed -i '/python3 \\/a\                       git \\' Dockerfile
+  fi
   mkdir ${_OUT_FOLDER}
   docker build --tag onlyoffice-document-editors-builder .
   docker run -e PRODUCT_VERSION=${_PRODUCT_VERSION} -e BUILD_NUMBER=${_BUILD_NUMBER} -e NODE_ENV='production' -v $(pwd)/${_OUT_FOLDER}:/build_tools/out onlyoffice-document-editors-builder /bin/bash -c 'cd tools/linux && python3 ./automate.py --branch=tags/'"${_GIT_CLONE_BRANCH}"
