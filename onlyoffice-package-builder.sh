@@ -131,7 +131,7 @@ fi
 
 PRUNE_DOCKER_CONTAINERS_ACTION="false"
 if [ "x${PRUNE_DOCKER_CONTAINERS}" != "x" ] ; then
-  if [ ${PRUNE_DOCKER_CONTAINERS} == "true" ] -o [ ${PRUNE_DOCKER_CONTAINERS} == "TRUE" ] ; then
+  if [ "${PRUNE_DOCKER_CONTAINERS}" = "true" ] || [ "${PRUNE_DOCKER_CONTAINERS}" = "TRUE" ] ; then
     PRUNE_DOCKER_CONTAINERS_ACTION="true"
     cat << EOF
     WARNING !
@@ -173,8 +173,23 @@ build_oo_binaries() {
   fi
   mkdir ${_OUT_FOLDER}
   docker build --tag onlyoffice-document-editors-builder .
-  docker run -e PRODUCT_VERSION=${_PRODUCT_VERSION} -e BUILD_NUMBER=${_BUILD_NUMBER} -e NODE_ENV='production' -v $(pwd)/${_OUT_FOLDER}:/build_tools/out onlyoffice-document-editors-builder /bin/bash -c 'cd tools/linux && python3 ./automate.py --branch=tags/'"${_GIT_CLONE_BRANCH}"
+  docker run \
+    -e PRODUCT_VERSION=${_PRODUCT_VERSION} \
+    -e BUILD_NUMBER=${_BUILD_NUMBER} \
+    -e NODE_ENV='production' \
+    -v $(pwd)/${_OUT_FOLDER}:/build_tools/out \
+    onlyoffice-document-editors-builder \
+    /bin/bash -c 'cd tools/linux && python3 ./automate.py --branch=tags/'"${_GIT_CLONE_BRANCH}"
+  run_exit=$?
+  if [ ${run_exit} -eq 0 ]; then
+    ds_dir="${_OUT_FOLDER}/linux_64/onlyoffice/documentserver"
+    if [ ! -d "${ds_dir}" ] || [ -z "$(ls -A "${ds_dir}" 2>/dev/null)" ]; then
+      echo "DocumentServer binaries not found in ${ds_dir}" >&2
+      run_exit=1
+    fi
+  fi
   cd ..
+  return ${run_exit}
 
 }
 
