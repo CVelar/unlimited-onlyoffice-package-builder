@@ -182,8 +182,9 @@ build_oo_binaries() {
     /bin/bash -c 'cd tools/linux && python3 ./automate.py --branch=tags/'"${_GIT_CLONE_BRANCH}"
   run_exit=$?
   if [ ${run_exit} -eq 0 ]; then
-    if [ ! -d "${_OUT_FOLDER}/linux_64/onlyoffice/documentserver" ]; then
-      echo "DocumentServer binaries not found in ${_OUT_FOLDER}" >&2
+    ds_dir="${_OUT_FOLDER}/linux_64/onlyoffice/documentserver"
+    if [ ! -d "${ds_dir}" ] || [ -z "$(ls -A "${ds_dir}" 2>/dev/null)" ]; then
+      echo "DocumentServer binaries not found in ${ds_dir}" >&2
       run_exit=1
     fi
   fi
