@@ -131,7 +131,7 @@ fi
 
 PRUNE_DOCKER_CONTAINERS_ACTION="false"
 if [ "x${PRUNE_DOCKER_CONTAINERS}" != "x" ] ; then
-  if [ ${PRUNE_DOCKER_CONTAINERS} == "true" ] -o [ ${PRUNE_DOCKER_CONTAINERS} == "TRUE" ] ; then
+  if [ "${PRUNE_DOCKER_CONTAINERS}" = "true" ] || [ "${PRUNE_DOCKER_CONTAINERS}" = "TRUE" ] ; then
     PRUNE_DOCKER_CONTAINERS_ACTION="true"
     cat << EOF
     WARNING !
@@ -181,6 +181,12 @@ build_oo_binaries() {
     onlyoffice-document-editors-builder \
     /bin/bash -c 'cd tools/linux && python3 ./automate.py --branch=tags/'"${_GIT_CLONE_BRANCH}"
   run_exit=$?
+  if [ ${run_exit} -eq 0 ]; then
+    if [ ! -d "${_OUT_FOLDER}/linux_64/onlyoffice/documentserver" ]; then
+      echo "DocumentServer binaries not found in ${_OUT_FOLDER}" >&2
+      run_exit=1
+    fi
+  fi
   cd ..
   return ${run_exit}
 
