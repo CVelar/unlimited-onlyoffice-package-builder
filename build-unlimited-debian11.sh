@@ -7,13 +7,13 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-LOG_FILE="$(dirname "$0")/build-debian11.log"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+LOG_FILE="${SCRIPT_DIR}/build-debian11.log"
 exec > >(tee "${LOG_FILE}") 2>&1
 
 finish() {
-  REPO_DIR="$(dirname "$0")"
-  cp "${LOG_FILE}" "${REPO_DIR}/debian11debug"
-  cd "${REPO_DIR}"
+  cp "${LOG_FILE}" "${SCRIPT_DIR}/debian11debug"
+  cd "${SCRIPT_DIR}"
   git add debian11debug
   git commit -m "Update debian11debug"
 }
