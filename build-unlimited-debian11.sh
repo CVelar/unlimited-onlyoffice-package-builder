@@ -120,7 +120,6 @@ mkdir -p ~/build-oo
 cd ~/build-oo
 git clone git@github.com:${GH_USER}/unlimited-onlyoffice-package-builder.git
 cd unlimited-onlyoffice-package-builder
-git checkout v0.0.1
 ./onlyoffice-package-builder.sh --product-version=${PRODUCT_VERSION} --build-number=${BUILD_NUMBER} --unlimited-organization=${GH_USER} --tag-suffix=-${BRAND} --debian-package-suffix=-${BRAND}
 
 echo "\nFertig. Das DEB Paket befindet sich unter: ~/build-oo/unlimited-onlyoffice-package-builder/document-server-package/deb/"

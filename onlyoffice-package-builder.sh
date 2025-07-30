@@ -171,6 +171,9 @@ build_oo_binaries() {
   if ! grep -q "git" Dockerfile; then
     sed -i '/python3 \\/a\                       git \\' Dockerfile
   fi
+  if grep -q 'ln -s /usr/bin/python2 /usr/bin/python' Dockerfile; then
+    sed -i 's|ln -s /usr/bin/python2 /usr/bin/python|ln -s /usr/bin/python3 /usr/bin/python|' Dockerfile
+  fi
   mkdir ${_OUT_FOLDER}
   docker build --tag onlyoffice-document-editors-builder .
   docker run \
