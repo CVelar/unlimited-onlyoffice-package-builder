@@ -7,13 +7,13 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-LOG_FILE="$(dirname "$0")/build-debian11.log"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+LOG_FILE="${SCRIPT_DIR}/build-debian11.log"
 exec > >(tee "${LOG_FILE}") 2>&1
 
 finish() {
-  REPO_DIR="$(dirname "$0")"
-  cp "${LOG_FILE}" "${REPO_DIR}/debian11debug"
-  cd "${REPO_DIR}"
+  cp "${LOG_FILE}" "${SCRIPT_DIR}/debian11debug"
+  cd "${SCRIPT_DIR}"
   git add debian11debug
   git commit -m "Update debian11debug"
 }
@@ -120,7 +120,6 @@ mkdir -p ~/build-oo
 cd ~/build-oo
 git clone git@github.com:${GH_USER}/unlimited-onlyoffice-package-builder.git
 cd unlimited-onlyoffice-package-builder
-git checkout v0.0.1
 ./onlyoffice-package-builder.sh --product-version=${PRODUCT_VERSION} --build-number=${BUILD_NUMBER} --unlimited-organization=${GH_USER} --tag-suffix=-${BRAND} --debian-package-suffix=-${BRAND}
 
 echo "\nFertig. Das DEB Paket befindet sich unter: ~/build-oo/unlimited-onlyoffice-package-builder/document-server-package/deb/"
